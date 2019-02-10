@@ -1,3 +1,3 @@
-React - The Complete Guide | Udemy 
-
--- Burger Builder Application --
+Udemy | React - The Complete Guide
+   
+   Burger Builder Application
