@@ -29,7 +29,9 @@ class BurgerBuilder extends Component {
   componentDidMount() {
     axios.get('https://react-burger-app-ad6aa.firebaseio.com/ingredients.json')
     .then(response => {
-      this.setState({ingredients: response.data});
+      const ingredients = response.data;
+      const sum = this.getIngredientCount(ingredients);
+      this.setState({ingredients: ingredients, purchasable: sum > 0});
     })
     .catch(error => {
       this.setState({error: true});
@@ -37,14 +39,18 @@ class BurgerBuilder extends Component {
   }
 
   updatePurchaseState = (ingredients) => {
-    const sum = Object.keys(ingredients)
+    const sum = this.getIngredientCount(ingredients);
+    this.setState({purchasable: sum > 0});
+  }
+
+  getIngredientCount =(ingredients) => {
+    return Object.keys(ingredients)
       .map((igKey) => {
         return ingredients[igKey];
       })
       .reduce((sum, el) => {
         return sum + el;
       }, 0);
-      this.setState({purchasable: sum > 0});
   }
 
   updatePrice = (type, operation) => {
