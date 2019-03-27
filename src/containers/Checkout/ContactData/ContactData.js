@@ -24,7 +24,7 @@ class ContactData extends Component {
   }
 
   createFormObject(inElementType, inConfigType, inConfigPlaceholder, inConfigOptions, inValue) {
-    let obj = null;
+    let obj;
     switch (inElementType) {
       case 'input':
         obj = {
@@ -43,7 +43,17 @@ class ContactData extends Component {
             options: inConfigOptions
           },
           value: inValue
-        }
+        };
+        break;
+      default:
+        obj = {
+          elementType: inElementType,
+          elementConfig: {
+            type: inConfigType,
+            placeholder: inConfigPlaceholder
+          },
+          value: inValue
+        };
     }
     return obj;
   }
