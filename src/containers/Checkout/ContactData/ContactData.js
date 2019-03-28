@@ -18,7 +18,7 @@ class ContactData extends Component {
         deliveryMethod: this.createFormObject('select', null, null, [
           {value: 'express', displayValue: 'Express'},
           {value: 'economic', displayValue: 'Economic'}
-        ], '')
+        ], 'express')
     },
     loading: false
   }
