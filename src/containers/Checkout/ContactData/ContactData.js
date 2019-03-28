@@ -10,20 +10,20 @@ class ContactData extends Component {
 
   state = {
     orderForm: {
-        name: this.createFormObject('input', 'text', 'Your Name', null, ''),
-        street: this.createFormObject('input', 'text', 'Street', null, ''),
-        zipCode: this.createFormObject('input', 'text', 'ZIP Code', null, ''),
-        country: this.createFormObject('input', 'text', 'Country', null, ''),
-        email: this.createFormObject('input', 'email', 'E-mail', null, ''),
+        name: this.createFormObject('input', 'text', 'Your Name', null, '', {required: true}),
+        street: this.createFormObject('input', 'text', 'Street', null, '', {required: true}),
+        zipCode: this.createFormObject('input', 'text', 'ZIP Code', null, '', {required: true, minLength: 5, maxLength: 5}),
+        country: this.createFormObject('input', 'text', 'Country', null, '', {required: true}),
+        email: this.createFormObject('input', 'email', 'E-mail', null, '', {required: true}),
         deliveryMethod: this.createFormObject('select', null, null, [
           {value: 'express', displayValue: 'Express'},
           {value: 'economic', displayValue: 'Economic'}
-        ], 'express')
+        ], 'express', {})
     },
     loading: false
   }
 
-  createFormObject(inElementType, inConfigType, inConfigPlaceholder, inConfigOptions, inValue) {
+  createFormObject(inElementType, inConfigType, inConfigPlaceholder, inConfigOptions, inValue, inValidationRules) {
     let obj;
     switch (inElementType) {
       case 'input':
@@ -33,7 +33,11 @@ class ContactData extends Component {
             type: inConfigType,
             placeholder: inConfigPlaceholder
           },
-          value: inValue
+          value: inValue,
+          validation: {
+            valid: false,
+            rules: inValidationRules
+          }
         };
         break;
       case 'select':
@@ -42,7 +46,11 @@ class ContactData extends Component {
           elementConfig: {
             options: inConfigOptions
           },
-          value: inValue
+          value: inValue,
+          validation: {
+            valid: true,
+            rules: inValidationRules
+          }
         };
         break;
       default:
@@ -52,7 +60,11 @@ class ContactData extends Component {
             type: inConfigType,
             placeholder: inConfigPlaceholder
           },
-          value: inValue
+          value: inValue,
+          validation: {
+            valid: false,
+            rules: inValidationRules
+          }
         };
     }
     return obj;
@@ -63,7 +75,6 @@ class ContactData extends Component {
     this.setState({loading: true});
     const formData = {};
     for (let formElementIdentifier in this.state.orderForm) {
-      console.log(this.state.orderForm[formElementIdentifier]);
       formData[formElementIdentifier] = this.state.orderForm[formElementIdentifier].value;
     }
     const order = {
@@ -79,6 +90,24 @@ class ContactData extends Component {
       .catch(response => this.setState({loading: false}));
   }
 
+  isValid(value, rules) {
+    let valid = true;
+
+    if (rules.required) {
+      valid = value.trim() !== '' && valid;
+    }
+
+    if (rules.minLength) {
+      valid = value.length >= rules.minLength && valid;
+    }
+
+    if (rules.maxLength) {
+      valid = value.length <= rules.maxLength && valid;
+    }
+
+    return valid;
+  }
+
   inputChangedHandler = (event, inputIdentifier) => {
     const updatedOrderForm = {
       ...this.state.orderForm
@@ -87,7 +116,9 @@ class ContactData extends Component {
       ...updatedOrderForm[inputIdentifier]
     };
     updatedFormElement.value = event.target.value;
+    updatedFormElement.validation.valid = this.isValid(updatedFormElement.value, updatedFormElement.validation.rules);
     updatedOrderForm[inputIdentifier] = updatedFormElement;
+    console.log(updatedFormElement);
     this.setState({orderForm: updatedOrderForm});
   }
 
