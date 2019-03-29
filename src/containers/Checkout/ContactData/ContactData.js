@@ -20,7 +20,8 @@ class ContactData extends Component {
           {value: 'economic', displayValue: 'Economic'}
         ], 'express', {})
     },
-    loading: false
+    loading: false,
+    formIsValid: false
   }
 
   createFormObject(inElementType, inConfigType, inConfigPlaceholder, inConfigOptions, inValue, inValidationRules) {
@@ -37,7 +38,8 @@ class ContactData extends Component {
           validation: {
             valid: false,
             rules: inValidationRules
-          }
+          },
+          touched: false
         };
         break;
       case 'select':
@@ -50,7 +52,8 @@ class ContactData extends Component {
           validation: {
             valid: true,
             rules: inValidationRules
-          }
+          },
+          touched: false
         };
         break;
       default:
@@ -64,7 +67,8 @@ class ContactData extends Component {
           validation: {
             valid: false,
             rules: inValidationRules
-          }
+          },
+          touched: false
         };
     }
     return obj;
@@ -115,11 +119,18 @@ class ContactData extends Component {
     const updatedFormElement = {
       ...updatedOrderForm[inputIdentifier]
     };
+
     updatedFormElement.value = event.target.value;
     updatedFormElement.validation.valid = this.isValid(updatedFormElement.value, updatedFormElement.validation.rules);
+    updatedFormElement.touched = true;
     updatedOrderForm[inputIdentifier] = updatedFormElement;
-    console.log(updatedFormElement);
-    this.setState({orderForm: updatedOrderForm});
+
+    let formIsValid = true;
+    for (let i in updatedOrderForm) {
+      formIsValid = updatedOrderForm[i].validation.valid && formIsValid;
+    }
+    
+    this.setState({orderForm: updatedOrderForm, formIsValid: formIsValid});
   }
 
   render() {
@@ -133,15 +144,20 @@ class ContactData extends Component {
 
     let form = (
       <form onSubmit={this.orderHandler}>
-        {formElements.map(element => (
-          <Input 
-            key={element.id}
-            elementType={element.config.elementType}
-            elementConfig={element.config.elementConfig}
-            value={element.config.value}
-            changed={(event) => this.inputChangedHandler(event, element.id)}/>
-        ))}
-        <Button btnType="Success">ORDER</Button>
+        {formElements.map(element => {
+          
+          return (
+            <Input 
+              key={element.id}
+              elementType={element.config.elementType}
+              elementConfig={element.config.elementConfig}
+              value={element.config.value}
+              inValid={!element.config.validation.valid}
+              touched={element.config.touched}
+              changed={(event) => this.inputChangedHandler(event, element.id)}/>
+          )
+        })}
+        <Button btnType="Success" disabled={!this.state.formIsValid}>ORDER</Button>
       </form>
     );
     if (this.state.loading) {
