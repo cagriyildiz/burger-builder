@@ -22,7 +22,14 @@ export const authFail = (error) => {
   };
 };
 
+const removeUserDataFromLocalStorage = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('expirationDate');
+  localStorage.removeItem('localId');
+};
+
 export const logout = () => {
+  removeUserDataFromLocalStorage();
   return {
     type: actionTypes.AUTH_LOGOUT
   };
@@ -34,6 +41,13 @@ export const checkAuthTimeout = (expirationTime) => {
       dispatch(logout());
     }, expirationTime * 1000);
   };
+};
+
+const setUserDataToLocalStorage = (idToken, expiresIn, localId) => {
+  const expirationDate = new Date(new Date().getTime() + expiresIn * 1000);
+  localStorage.setItem('token', idToken);
+  localStorage.setItem('expirationDate', expirationDate);
+  localStorage.setItem('localId', localId);
 };
 
 export const auth = (email, password, isSignup) => {
@@ -49,6 +63,7 @@ export const auth = (email, password, isSignup) => {
                          "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=";
     axios.post(url + apiKey, authData)
       .then(response => {
+        setUserDataToLocalStorage(response.data.idToken, response.data.expiresIn, response.data.localId);
         dispatch(authSuccess(response.data.idToken, response.data.localId));
         dispatch(checkAuthTimeout(response.data.expiresIn));
       })
@@ -63,4 +78,22 @@ export const setAuthRedirectPath = (path) => {
     type: actionTypes.SET_AUTH_REDIRECT_PATH,
     path: path
   };
+};
+
+export const authCheckState = () => {
+  return dispatch => {
+    const token = localStorage.getItem('token');
+    const expirationDate = new Date(localStorage.getItem('expirationDate'));
+    const localId = localStorage.getItem('localId');
+    if (token) {
+      if (expirationDate > new Date()) {
+        dispatch(authSuccess(token, localId));
+        dispatch(checkAuthTimeout((expirationDate.getTime() - new Date().getTime()) / 1000));
+      } else {
+        dispatch(logout());  
+      }
+    } else {
+      dispatch(logout());
+    }
+  }
 };
