@@ -8,7 +8,7 @@ import classes from './ContactData.css';
 import axios from '../../../axios-orders';
 import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
 import * as actions from '../../../store/actions/index';
-import { updateObject } from '../../../shared/utility';
+import { updateObject, isValid } from '../../../shared/utility';
 
 class ContactData extends Component {
 
@@ -93,29 +93,11 @@ class ContactData extends Component {
     this.props.onOrderBurger(order, this.props.token);
   }
 
-  isValid(value, rules) {
-    let valid = true;
-
-    if (rules.required) {
-      valid = value.trim() !== '' && valid;
-    }
-
-    if (rules.minLength) {
-      valid = value.length >= rules.minLength && valid;
-    }
-
-    if (rules.maxLength) {
-      valid = value.length <= rules.maxLength && valid;
-    }
-
-    return valid;
-  }
-
   inputChangedHandler = (event, inputIdentifier) => {
     const updatedFormElement = updateObject(this.state.orderForm[inputIdentifier], {
       value: event.target.value,
       validation: updateObject(this.state.orderForm[inputIdentifier].validation, {
-        valid: this.isValid(event.target.value, this.state.orderForm[inputIdentifier].validation.rules)
+        valid: isValid(event.target.value, this.state.orderForm[inputIdentifier].validation.rules)
       }),
       touched: true
     });
