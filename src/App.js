@@ -20,10 +20,11 @@ const Auth = React.lazy(() => {
 });
 
 const app = (props) => {
-
+  const {onTryAutoSingin} = props;
+  
   useEffect(() => {
-    props.onTryAutoSingin();
-  }, []);
+    onTryAutoSingin();
+  }, [onTryAutoSingin]);
 
   let route = (
     <Switch>
