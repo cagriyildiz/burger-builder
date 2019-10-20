@@ -22,16 +22,9 @@ export const authFail = (error) => {
   };
 };
 
-const removeUserDataFromLocalStorage = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('expirationDate');
-  localStorage.removeItem('localId');
-};
-
 export const logout = () => {
-  removeUserDataFromLocalStorage();
   return {
-    type: actionTypes.AUTH_LOGOUT
+    type: actionTypes.AUTH_INIT_LOGOUT
   };
 };
 
