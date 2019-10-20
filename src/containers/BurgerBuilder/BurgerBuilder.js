@@ -16,7 +16,7 @@ const burgerBuilder = (props) => {
 
   const {onInitIngredients} = props;
   useEffect(() => {
-    onInitIngredients();
+    onInitIngredients(props.totalPrice);
   }, [onInitIngredients]);
 
   const getTotalIngredientCount = (ingredients) => {
@@ -100,7 +100,7 @@ const mapDispatchToProps = dispatch => {
   return {
     onIngredientAdded: (ingredient) => dispatch(actions.addIngredient(ingredient)),
     onIngredientRemoved: (ingredient) => dispatch(actions.removeIngredient(ingredient)),
-    onInitIngredients: () => dispatch(actions.initIngredients()),
+    onInitIngredients: (totalPrice) => dispatch(actions.initIngredients(totalPrice)),
     onPurchaseInit: () => dispatch(actions.purchaseInit()),
     onSetAuthRedirectPath: (path) => dispatch(actions.setAuthRedirectPath(path))
   };
